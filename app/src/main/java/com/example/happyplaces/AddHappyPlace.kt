@@ -1,17 +1,22 @@
 package com.example.happyplaces
 
 import android.Manifest
+import android.app.Activity
 import android.app.DatePickerDialog
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.provider.MediaStore
 import android.provider.Settings
 import android.view.View
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
 import com.karumi.dexter.Dexter
@@ -19,6 +24,7 @@ import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
+import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -29,6 +35,8 @@ class AddHappyPlace : AppCompatActivity(), View.OnClickListener {
     private lateinit var dateSetListener: DatePickerDialog.OnDateSetListener
     private lateinit var etdate: EditText
     private lateinit var tvaddImage : TextView
+    private lateinit var ivPlaceImage : ImageView
+    private lateinit var galleryImageResultLauncher: ActivityResultLauncher<Intent>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,6 +44,8 @@ class AddHappyPlace : AppCompatActivity(), View.OnClickListener {
 
         etdate = findViewById<EditText>(R.id.et_date)
         tvaddImage=findViewById<TextView>(R.id.tv_add_image)
+        ivPlaceImage=findViewById(R.id.iv_place_image)
+
         val toolbar_add_place= findViewById<Toolbar>(R.id.toolbar_add_place)
 
         setSupportActionBar(toolbar_add_place)
@@ -54,6 +64,8 @@ class AddHappyPlace : AppCompatActivity(), View.OnClickListener {
             }
             etdate.setOnClickListener(this)
             tvaddImage.setOnClickListener(this)
+
+        registerOnActivityForGalleryResult()
     }
     override fun onClick(v: View?) {
         when (v!!.id) {
@@ -95,6 +107,8 @@ class AddHappyPlace : AppCompatActivity(), View.OnClickListener {
             {
                 if(report!!.areAllPermissionsGranted()){
                 Toast.makeText(this@AddHappyPlace,"Storage READ/WRITE permissions are granted",Toast.LENGTH_SHORT).show()
+                    val galleryIntent=Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+                    galleryImageResultLauncher.launch(galleryIntent)
                 }
             }
             override fun onPermissionRationaleShouldBeShown(permissions:MutableList<PermissionRequest>, token: PermissionToken)
@@ -118,5 +132,27 @@ class AddHappyPlace : AppCompatActivity(), View.OnClickListener {
         }.setNegativeButton("Cancel") { dialog, _ ->
             dialog.dismiss()
         }.show()
+    }
+
+    private fun registerOnActivityForGalleryResult(){
+        galleryImageResultLauncher=registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
+            result->
+            if(result.resultCode== Activity.RESULT_OK){
+                val data:Intent?=result.data
+                if(data!=null){
+                    val contentUri=data.data
+                    try {
+                        ivPlaceImage.setImageURI(contentUri)
+                    } catch (e: IOException) {
+                        e.printStackTrace()
+                        Toast.makeText(
+                            this,
+                            "Failed to load image from gallery",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+            }
+        }
     }
 }
