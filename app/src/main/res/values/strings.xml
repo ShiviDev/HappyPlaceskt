@@ -9,4 +9,5 @@
     <string name="btn_text_save">SAVE</string>
     <string name="content_description_loc">Location</string>
     <string name="content_description_desc">Add Description</string>
+    <string name="note_text_no_happy_places_found_yet">No Happy Places Found Yet</string>
 </resources>
