@@ -4,6 +4,8 @@ import android.Manifest
 import android.app.Activity
 import android.app.DatePickerDialog
 import android.content.ActivityNotFoundException
+import android.content.Context
+import android.content.ContextWrapper
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
@@ -11,7 +13,9 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
 import android.provider.Settings
+import android.util.Log
 import android.view.View
+import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
@@ -25,21 +29,29 @@ import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
+import java.io.File
+import java.io.FileOutputStream
 import java.io.IOException
+import java.io.OutputStream
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
+import java.util.UUID
 
 class AddHappyPlace : AppCompatActivity(), View.OnClickListener {
 
     /*Calendar initialisation*/
     private var cal = Calendar.getInstance()
     private lateinit var dateSetListener: DatePickerDialog.OnDateSetListener
+    private var saveImageToInternalStorage:Uri?=null
+    private var mLatitude: Double=0.0
+    private var mLongiture: Double = 0.0
 
     /*View declarations*/
     private lateinit var etdate: EditText
     private lateinit var tvaddImage : TextView
     private lateinit var ivPlaceImage : ImageView
+    private lateinit var btnSave: Button
 
     /*Image initialisations*/
     private lateinit var galleryImageResultLauncher: ActivityResultLauncher<Intent>
@@ -76,6 +88,7 @@ class AddHappyPlace : AppCompatActivity(), View.OnClickListener {
         //view listeners
             etdate.setOnClickListener(this)
             tvaddImage.setOnClickListener(this)
+            btnSave.setOnClickListener(this)
 
         //call for updating image from gallery
         registerOnActivityForGalleryResult()
@@ -195,8 +208,12 @@ class AddHappyPlace : AppCompatActivity(), View.OnClickListener {
                 val data:Intent?=result.data
                 if(data!=null){
                     val contentUri=data.data
+
                     try {
                         ivPlaceImage.setImageURI(contentUri)
+                        val selectedImage: Bitmap = MediaStore.Images.Media.getBitmap(this.contentResolver, contentUri)
+                        saveImageToInternalStorage = saveImageToInternalStorage(selectedImage)
+                        Log.e("Saved image:","Path:: $saveImageToInternalStorage")
                     } catch (e: IOException) {
                         e.printStackTrace()
                         Toast.makeText(
@@ -211,6 +228,7 @@ class AddHappyPlace : AppCompatActivity(), View.OnClickListener {
     }
 //end of registerOnActivityForGalleryResult
 
+    //start of registerOnActivityForCameraResult
     private fun registerOnActivityForCameraResult(){
         cameraImageResultLauncher=registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
@@ -218,11 +236,30 @@ class AddHappyPlace : AppCompatActivity(), View.OnClickListener {
                 val data: Intent? = result.data
 
                 val thumbNail : Bitmap = data!!.extras?.get("data") as Bitmap
+                saveImageToInternalStorage=saveImageToInternalStorage(thumbNail)
+                Log.e("Saved Image : ", "Path :: $saveImageToInternalStorage")
+
                 ivPlaceImage.setImageBitmap(thumbNail)
             }
         }
     }
 
+//end of registeOnActivityForCameraResult
+private fun saveImageToInternalStorage(bitmap: Bitmap):Uri{
+    val wrapper = ContextWrapper(applicationContext)
+    var file = wrapper.getDir("HappyPlacesImages", Context.MODE_PRIVATE)
+    file = File(file, "${UUID.randomUUID()}.jpg")
+    try {
+        val stream: OutputStream = FileOutputStream(file)
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream)
+        stream.flush()
+        stream.close()
+    }catch (e:IOException){
+        e.printStackTrace()
+    }
+    return Uri.parse(file.absolutePath)
+
+}
 
 
 
