@@ -52,6 +52,9 @@ class AddHappyPlace : AppCompatActivity(), View.OnClickListener {
     private lateinit var tvaddImage : TextView
     private lateinit var ivPlaceImage : ImageView
     private lateinit var btnSave: Button
+    private lateinit var etTitle: EditText
+    private lateinit var etDescription:EditText
+    private lateinit var etLocation:EditText
 
     /*Image initialisations*/
     private lateinit var galleryImageResultLauncher: ActivityResultLauncher<Intent>
@@ -66,6 +69,10 @@ class AddHappyPlace : AppCompatActivity(), View.OnClickListener {
         etdate = findViewById<EditText>(R.id.et_date)
         tvaddImage=findViewById<TextView>(R.id.tv_add_image)
         ivPlaceImage=findViewById(R.id.iv_place_image)
+        btnSave = findViewById(R.id.btn_save)
+        etTitle=findViewById(R.id.et_title)
+        etDescription=findViewById(R.id.et_description)
+        etLocation=findViewById(R.id.et_location)
 
         val toolbar_add_place= findViewById<Toolbar>(R.id.toolbar_add_place)
 
@@ -84,7 +91,7 @@ class AddHappyPlace : AppCompatActivity(), View.OnClickListener {
 
                 updateDateInView()
             }
-
+        updateDateInView()
         //view listeners
             etdate.setOnClickListener(this)
             tvaddImage.setOnClickListener(this)
@@ -125,6 +132,25 @@ class AddHappyPlace : AppCompatActivity(), View.OnClickListener {
                     }
                 }
                 pictureDialog.show()
+            }
+
+            R.id.btn_save->{
+                when{
+                    etTitle.text.isNullOrEmpty()->{
+                        Toast.makeText(this@AddHappyPlace,"Please enter title",Toast.LENGTH_SHORT).show()
+                    }
+                    etDescription.text.isNullOrEmpty()->{
+                        Toast.makeText(this@AddHappyPlace,"Please enter description",Toast.LENGTH_SHORT).show()
+                    }
+                    etLocation.text.isNullOrEmpty()->{
+                        Toast.makeText(this@AddHappyPlace,"Please enter location",Toast.LENGTH_SHORT).show()
+                    }
+                    saveImageToInternalStorage==null->{
+                        Toast.makeText(this@AddHappyPlace,"Please select image",Toast.LENGTH_SHORT).show()
+                    }else->{
+                        val happyPlaceModel=null
+                    }
+                }
             }
         }
     }
