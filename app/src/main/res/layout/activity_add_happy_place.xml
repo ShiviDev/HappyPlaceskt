@@ -5,7 +5,7 @@
     android:theme="@style/Theme.MaterialComponents.DayNight.DarkActionBar"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".AddHappyPlace">
+    tools:context=".activities.AddHappyPlace">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar_add_place"

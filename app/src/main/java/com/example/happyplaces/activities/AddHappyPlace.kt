@@ -1,4 +1,4 @@
-package com.example.happyplaces
+package com.example.happyplaces.activities
 
 import android.Manifest
 import android.app.Activity
@@ -24,6 +24,9 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
+import com.example.happyplaces.R
+import com.example.happyplaces.database.DatabaseHandler
+import com.example.happyplaces.models.HappyPlaceModel
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
@@ -45,7 +48,7 @@ class AddHappyPlace : AppCompatActivity(), View.OnClickListener {
     private lateinit var dateSetListener: DatePickerDialog.OnDateSetListener
     private var saveImageToInternalStorage:Uri?=null
     private var mLatitude: Double=0.0
-    private var mLongiture: Double = 0.0
+    private var mLongitude: Double = 0.0
 
     /*View declarations*/
     private lateinit var etdate: EditText
@@ -118,7 +121,7 @@ class AddHappyPlace : AppCompatActivity(), View.OnClickListener {
             }
 
             //setting text view to act like a button
-            R.id.tv_add_image->{
+            R.id.tv_add_image ->{
                 //alret pops up asking to select an action
                 val pictureDialog= AlertDialog.Builder(this)
                 pictureDialog.setTitle("Select Action")
@@ -134,7 +137,7 @@ class AddHappyPlace : AppCompatActivity(), View.OnClickListener {
                 pictureDialog.show()
             }
 
-            R.id.btn_save->{
+            R.id.btn_save ->{
                 when{
                     etTitle.text.isNullOrEmpty()->{
                         Toast.makeText(this@AddHappyPlace,"Please enter title",Toast.LENGTH_SHORT).show()
@@ -148,7 +151,30 @@ class AddHappyPlace : AppCompatActivity(), View.OnClickListener {
                     saveImageToInternalStorage==null->{
                         Toast.makeText(this@AddHappyPlace,"Please select image",Toast.LENGTH_SHORT).show()
                     }else->{
-                        val happyPlaceModel=null
+                        val happyPlaceModel= HappyPlaceModel(
+                            0,
+                            etTitle.text.toString(),
+                            saveImageToInternalStorage.toString(),
+                            etDescription.text.toString(),
+                            etdate.text.toString(),
+                            etLocation.text.toString(),
+                            mLatitude,
+                            mLongitude
+                        )
+
+                    // Here we initialize the database handler class.
+                    val dbHandler = DatabaseHandler(this)
+
+                    val addHappyPlace = dbHandler.addHappyPlace(happyPlaceModel)
+
+                    if (addHappyPlace > 0) {
+                        Toast.makeText(
+                            this,
+                            "The happy place details are inserted successfully.",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        finish();//finishing activity
+                    }
                     }
                 }
             }

@@ -10,4 +10,7 @@
     <string name="content_description_loc">Location</string>
     <string name="content_description_desc">Add Description</string>
     <string name="note_text_no_happy_places_found_yet">No Happy Places Found Yet</string>
+
+    <string name="note_text_no_happy_places_found_yet_kindly_add_one">No Happy Places Found Yet. Kindly add one.</string>
+    <string name="image_content_description">image</string>
 </resources>
