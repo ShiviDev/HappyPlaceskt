@@ -28,6 +28,7 @@ class MainActivity : AppCompatActivity() {
 
         fabAddHappyPlace.setOnClickListener {
             val intent = Intent(this@MainActivity, AddHappyPlace::class.java)
+
             startActivity(intent)
         }
 
@@ -77,9 +78,15 @@ class MainActivity : AppCompatActivity() {
             HappyPlacesAdapter.OnClickListener {
             override fun onClick(position: Int, model: HappyPlaceModel) {
                 val intent = Intent(this@MainActivity, HappyPlaceDetail::class.java)
+                intent.putExtra(EXTRA_PLACE_DETAILS, model)
                 startActivity(intent)
             }
         })
     }
     // END
+
+    companion object {
+        internal const val EXTRA_PLACE_DETAILS = "extra_place_details"
+        // END
+    }
 }
