@@ -35,6 +35,11 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    override fun onResume() {
+        super.onResume()
+        getHappyPlacesListFromLocalDB()
+    }
+
     /**
      * A function to get the list of happy place from local database.
      */
