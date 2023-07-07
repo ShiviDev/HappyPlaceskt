@@ -88,11 +88,26 @@ class DatabaseHandler(context: Context) :
         contentValues.put(KEY_LONGITUDE, happyPlace.longitude)
 
         // Updating Row
-        val success = db.update(TABLE_HAPPY_PLACE, contentValues, KEY_ID + "=" + happyPlace.id, null)
+        val success = db.update(TABLE_HAPPY_PLACE,
+            contentValues,
+            KEY_ID + "=" + happyPlace.id, null)
 
         db.close() // Closing database connection
         return success
     }
+
+    /**
+     * Function to delete happy place details.
+     */
+    fun deleteHappyPlace(happyPlace: HappyPlaceModel): Int {
+        val db = this.writableDatabase
+        // Deleting Row
+        val success = db.delete(TABLE_HAPPY_PLACE, KEY_ID + "=" + happyPlace.id, null)
+        //2nd argument is String containing nullColumnHack
+        db.close() // Closing database connection
+        return success
+    }
+    // END
 
     fun getHappyPlacesList(): ArrayList<HappyPlaceModel> {
 
